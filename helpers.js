@@ -1,8 +1,9 @@
 const qs = require('querystring').stringify
 const util = require('util')
 const _ = require('lodash')
+const axios = require('axios')
 
-module.exports.buildURLString = (
+const buildURLString = (
   config,
   moduleName,
   zohoMethod,
@@ -11,11 +12,11 @@ module.exports.buildURLString = (
 ) =>
   `https://${config.host}/crm/private/json/${moduleName}/${
     zohoMethod
-  }?&scope=crmapi&&version=${config.version}&authtoken=${config.authToken}&${qs(
+  }?scope=crmapi&version=${config.version}&authtoken=${config.authToken}&${qs(
     params
   )}${misc}`
 
-module.exports.toXmlData = (moduleName, data) => {
+const toXmlData = (moduleName, data) => {
   var rows
   if (!_.isArray(data)) {
     rows = [data]
@@ -37,8 +38,73 @@ module.exports.toXmlData = (moduleName, data) => {
   return ret
 }
 
-module.exports.fromXmlData = data => {
-  return data.FL.reduce((p, c) => {
-    return { ...p, [c.val]: c.content }
-  }, {})
+const fromXmlData = data =>
+  Array.isArray(data.FL)
+    ? data.FL.reduce((p, c) => ({ ...p, [c.val]: c.content }), {})
+    : { [data.FL.val]: data.FL.content }
+const selectColumns = (columns = []) => `(${columns.join(',')})`
+const selectIds = (ids = []) => ids.join(';')
+
+const retrieveAllModuleData = async (config, moduleName, ownerId, columns) => {
+  try {
+    const step = config.maxRead
+    let index = 1
+    let stepModuleData = []
+    let allModuleData = []
+    do {
+      const zohoResponse = (await axios.get(
+        buildURLString(
+          config,
+          moduleName,
+          ownerId ? 'searchRecords' : 'getRecords',
+          { fromIndex: index, toIndex: index - 1 + step },
+          ownerId
+            ? `&criteria=(Deal Owner:${ownerId})`
+            : '' +
+              (columns.length ? `&selectColumns=${selectColumns(columns)}` : '')
+        )
+      )).data.response
+      if (zohoResponse.nodata) return []
+      if (zohoResponse.error) {
+        throw new Error(
+          `API error ${zohoResponse.error.code}, ${zohoResponse.error.message}`
+        )
+      }
+      stepModuleData = zohoResponse.result[moduleName].row
+      if (Array.isArray(stepModuleData))
+        allModuleData = allModuleData.concat(_.map(stepModuleData, fromXmlData))
+      else allModuleData.push(fromXmlData(stepModuleData))
+      index = index + step
+    } while (stepModuleData.length === step)
+    return allModuleData
+  } catch (e) {
+    logError(e)
+  }
+}
+
+const validateInit = ({ authToken }) => {
+  try {
+    if (!authToken)
+      throw new Error(
+        "'init' function needs to be called first and requires valid config object with, at minimum, 'authToken' property set"
+      )
+    else return true
+  } catch (e) {
+    logError(e)
+  }
+}
+
+const logError = err => {
+  console.error(`Zoho-CRM Error: ${err.message}`)
+}
+
+module.exports = {
+  buildURLString,
+  toXmlData,
+  fromXmlData,
+  selectColumns,
+  selectIds,
+  retrieveAllModuleData,
+  validateInit,
+  logError
 }

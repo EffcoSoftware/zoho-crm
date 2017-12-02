@@ -40,13 +40,30 @@ zoho.init({
 const users = await zoho.get('Users')
 // Retrieve all Deals
 const deals = await zoho.get('Deals')
+// Retrieve all Deals - select columns returned (DEALID is always returned)
+const deals = await zoho.get('Deals', {}, ['Column 1', 'Column 2'])
 // Retrieve all Deals owned by a User
 const deals = await zoho.get('Deals', { ownerId: 'OWNER_ID' })
-// Retrieve one Deal
+// Retrieve one Deal byId
 const deal = await zoho.get('Deals', { id: 'DEAL_ID' })
+// Retrieve one Deal byId - select columns returned (DEALID is always returned)
+const deal = await zoho.get('Deals', { id: 'DEAL_ID' }, ['Column 1', 'Column 2'])
+// Retrieve multiple Deals
+const deal = await zoho.get('Deals', { id: ['DEAL_ID1', 'DEAL_ID2'] })
+// Retrieve multiple Deals byId - select columns returned (DEALID is always returned)
+const deal = await zoho.get('Deals', { id: ['DEAL_ID1', 'DEAL_ID2'], ['Column 1', 'Column 2'] })
 // Update one Deal
-zoho.update('Deals', 'DEAL_ID', {
-   Stage: 'Qualification',
+zoho.update('Deals', {
+  id: 'DEAL_ID'
+  Stage: 'Qualification',
   'Custom field': 'New Value'
 })
+// Update multiple Deals
+zoho.update('Deals', [{
+  id: 'DEAL_ID1'
+  Stage: 'Qualification',
+},
+  { id: 'DEAL_ID2',
+  'Custom field': 'New Value'
+}])
 ```
