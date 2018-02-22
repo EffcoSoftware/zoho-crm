@@ -63,7 +63,7 @@ class Zoho {
             moduleName,
             'getRecordById',
             null,
-            `&idlist=${selectIds(id.slice(index, index + step - 1))}` +
+            `&idlist=${selectIds(id.slice(index, index + step))}` +
               (columns.length ? `&selectColumns=${selectColumns(columns)}` : '')
           )
         )).data.response
