@@ -56,17 +56,19 @@ class Zoho {
       let index = 0
       let stepModuleData = []
       let allModuleData = []
+      let list
       do {
-        const zohoResponse = (await axios.get(
-          buildURLString(
-            this.config,
-            moduleName,
-            'getRecordById',
-            null,
-            `&idlist=${selectIds(id.slice(index, index + step))}` +
-              (columns.length ? `&selectColumns=${selectColumns(columns)}` : '')
-          )
-        )).data.response
+        list = id.slice(index, index + step)
+        const url = buildURLString(
+          this.config,
+          moduleName,
+          'getRecordById',
+          null,
+          `&idlist=${selectIds(list)}` +
+            (columns.length ? `&selectColumns=${selectColumns(columns)}` : '')
+        )
+        console.log(url)
+        const zohoResponse = (await axios.get(url)).data.response
         if (zohoResponse.nodata) return []
         if (zohoResponse.error) {
           throw new Error(
@@ -82,7 +84,7 @@ class Zoho {
           )
         else allModuleData.push(fromXmlData(stepModuleData))
         index = index + step
-      } while (stepModuleData.length === step)
+      } while (list.length === step)
       return allModuleData
     }
     // Retrieve all records using 'getRecords' method
