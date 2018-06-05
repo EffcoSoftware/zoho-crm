@@ -59,31 +59,32 @@ class Zoho {
       let list
       do {
         list = id.slice(index, index + step)
-        const url = buildURLString(
-          this.config,
-          moduleName,
-          'getRecordById',
-          null,
-          `&idlist=${selectIds(list)}` +
-            (columns.length ? `&selectColumns=${selectColumns(columns)}` : '')
-        )
-        console.log(url)
-        const zohoResponse = (await axios.get(url)).data.response
-        if (zohoResponse.nodata) return []
-        if (zohoResponse.error) {
-          throw new Error(
-            `API error ${zohoResponse.error.code}, ${
-              zohoResponse.error.message
-            }`
+        if (list.length) {
+          const url = buildURLString(
+            this.config,
+            moduleName,
+            'getRecordById',
+            null,
+            `&idlist=${selectIds(list)}` +
+              (columns.length ? `&selectColumns=${selectColumns(columns)}` : '')
           )
+          const zohoResponse = (await axios.get(url)).data.response
+          if (zohoResponse.nodata) return []
+          if (zohoResponse.error) {
+            throw new Error(
+              `API error ${zohoResponse.error.code}, ${
+                zohoResponse.error.message
+              }`
+            )
+          }
+          stepModuleData = zohoResponse.result[moduleName].row
+          if (Array.isArray(stepModuleData))
+            allModuleData = allModuleData.concat(
+              _.map(stepModuleData, fromXmlData)
+            )
+          else allModuleData.push(fromXmlData(stepModuleData))
+          index = index + step
         }
-        stepModuleData = zohoResponse.result[moduleName].row
-        if (Array.isArray(stepModuleData))
-          allModuleData = allModuleData.concat(
-            _.map(stepModuleData, fromXmlData)
-          )
-        else allModuleData.push(fromXmlData(stepModuleData))
-        index = index + step
       } while (list.length === step)
       return allModuleData
     }
