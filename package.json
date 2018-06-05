@@ -1,6 +1,6 @@
 {
   "name": "@effco/zoho-crm",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Wrapper around Zoho CRM API",
   "homepage": "https://github.com/EffcoSoftware/zoho-crm",
   "repository": {

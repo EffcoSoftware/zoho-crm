@@ -114,7 +114,7 @@ class Zoho {
             `xmlData=${toXmlData(
               moduleName,
               dataArray
-                .slice(index, index + step - 1)
+                .slice(index, index + step)
                 .map(({ id, ...rest }) => ({ Id: id, ...rest }))
             )}`
           )
