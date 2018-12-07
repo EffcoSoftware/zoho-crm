@@ -10,11 +10,11 @@ const buildURLString = (
   params = {},
   misc = ''
 ) =>
-  `https://${config.host}/crm/private/json/${moduleName}/${
-    zohoMethod
-  }?scope=crmapi&version=${config.version}&authtoken=${config.authToken}&${qs(
-    params
-  )}${misc}`
+  `https://${
+    config.host
+  }/crm/private/json/${moduleName}/${zohoMethod}?scope=crmapi&version=${
+    config.version
+  }&authtoken=${config.authToken}&${qs(params)}${misc}`
 
 const toXmlData = (moduleName, data) => {
   var rows
@@ -29,7 +29,11 @@ const toXmlData = (moduleName, data) => {
     ret += util.format('<row no="%s">', idx + 1)
     _.each(row, function(value, key) {
       if (!_.isUndefined(value) || !_.isNull(value)) {
-        ret += util.format('<FL val="%s"><![CDATA[%s]]></FL>', key, value)
+        ret += util.format(
+          '<FL val="%s"><![CDATA[%s]]></FL>',
+          key,
+          encodeURIComponent(value)
+        )
       }
     })
     ret += util.format('</row>')
@@ -61,7 +65,9 @@ const retrieveAllModuleData = async (config, moduleName, ownerId, columns) => {
           ownerId
             ? `&criteria=(Deal Owner:${ownerId})`
             : '' +
-              (columns.length ? `&selectColumns=${selectColumns(columns)}` : '')
+                (columns.length
+                  ? `&selectColumns=${selectColumns(columns)}`
+                  : '')
         )
       )).data.response
       if (zohoResponse.nodata) return []
