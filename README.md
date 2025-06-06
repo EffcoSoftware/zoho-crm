@@ -1,6 +1,6 @@
 # @effco/zoho-crm
 
-Another _WORK IN PROGESS_ tool from us!
+Another _WORK IN PROGRESS_ tool from us!
 
 ## _v0.2 works with V2 of Zoho API, for V1 use v0.1 of the library_
 
