@@ -45,7 +45,9 @@ const formatTokensForStore = (
   if (tokenData.refresh_token) refreshToken = tokenData.refresh_token;
   const tokenStore: ITokenStore = {
     accessToken: tokenData.access_token,
-    expiry: new Date().getTime() + tokenData.expires_in,
+    // Zoho returns the expiry time in seconds but Date.now() is in
+    // milliseconds. Convert the value to milliseconds before adding.
+    expiry: new Date().getTime() + tokenData.expires_in * 1000,
     refreshToken
   };
   return tokenStore;
