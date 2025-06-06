@@ -52,7 +52,7 @@ class Zoho {
     try {
       const token = await utils.getToken(this.config)
       const response = await axios.get(
-        `${url}${utils.getQueryFields(columns)}`,
+        `${url}${utils.getQueryFields(columns, url.includes('?'))}`,
         {
           headers: { Authorization: `Zoho-oauthtoken ${token}` }
         }

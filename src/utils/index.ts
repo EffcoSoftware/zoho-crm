@@ -82,10 +82,14 @@ const replaceSpaces = (
   return mapped;
 };
 
-const getQueryFields = (columns: Array<string>): string => {
+const getQueryFields = (
+  columns: Array<string>,
+  hasQuery: boolean = false
+): string => {
   if (!columns.length) return "";
   const columnsWithoutSpaces = columns.map(c => replaceSpace(c));
-  return `?fields=${columnsWithoutSpaces.join(",")}`;
+  const prefix = hasQuery ? "&" : "?";
+  return `${prefix}fields=${columnsWithoutSpaces.join(",")}`;
 };
 
 const getTokenFromGrantToken = async (config: IConfig): Promise<string> => {
