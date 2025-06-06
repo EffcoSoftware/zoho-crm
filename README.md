@@ -83,14 +83,14 @@ const deal = await zoho.get('deals', { id: ['dealId1', 'dealId2']}, ['Column 1',
 ```
 // Update one Deal
 zoho.update('Deals', {
-  id: 'dealId'
+  id: 'dealId',
   Stage: 'Qualification',
   'Custom field': 'New Value'
 })
 
 // Update multiple Deals
 zoho.update('Deals', [{
-  id: 'dealId1'
+  id: 'dealId1',
   Stage: 'Qualification',
 },
   { id: 'DEAL_ID2',
