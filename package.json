@@ -28,6 +28,6 @@
   },
   "scripts": {
     "prepublish": "rmdir /S /Q lib && tsc",
-    "test": "jest --watch"
+    "test": "jest"
   }
 }
